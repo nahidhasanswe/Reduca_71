@@ -1,29 +1,24 @@
 package com.example.nahid.nasaapps;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Handler;
+import android.preference.DialogPreference;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import org.w3c.dom.Text;
-
-import Database.dataBase;
 
 public class MainActivity extends ActionBarActivity {
 
     private ProgressBar progressForest, progressAgriculture, progressIndustry, progressResidiantial, progressWater, progressEnergy, progressTransport;
     private TextView forestText, agricultureText, industryText, residiantialText, waterText, energyText, transportText, location;
-    private ProgressDialog progress;
+    private ProgressDialog progress,flashProgress;
     private Button locationDetect;
-    dataBase mydb;
+    private View view1;
 
 
 
@@ -55,13 +50,6 @@ public class MainActivity extends ActionBarActivity {
         progressTransport = (ProgressBar) findViewById(R.id.transport);
 
 
-        try {
-            initialize();
-            mydb=new dataBase(this);
-        }catch (Exception e){
-
-        }
-
         locationDetect=(Button)findViewById(R.id.detect);
         locationDetect.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -69,9 +57,15 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+        try {
+            initialize();
+        }catch (Exception e){
 
+        }
 
     }
+
+
 
 
     private void progress(final View view){
@@ -97,7 +91,7 @@ public class MainActivity extends ActionBarActivity {
 
                         time=time+5;
 
-                        if (time==50) {
+                        if (time==75) {
                             progress.dismiss();
                             clicl(view);
                         }
@@ -110,10 +104,30 @@ public class MainActivity extends ActionBarActivity {
         }).start();
     }
 
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Closing Activity")
+                .setMessage("Are you sure you want to close this activity?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                        System.exit(0);
+                    }
+
+                })
+                .setNegativeButton("No", null)
+                .show();
+
+    }
 
     private void clicl(View view){
 
         Intent myIntent = new Intent(view.getContext(), SecondActivity.class);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivityForResult(myIntent, 0);
 
     }
